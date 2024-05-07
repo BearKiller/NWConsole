@@ -19,10 +19,10 @@ try
     char option;
 
     // Update this array with each menu option added
-    char[] optionArray = new char[] {'1', '2', '3', '4', 'q', 'Q'};
-    char[] menuOptionsArray = new char[4];
+    char[] optionArray = new char[] {'1', '2', '3', '4', '5', 'q', 'Q'};
+    char[] menuOptionsArray = new char[5];
     char[] optionYN = new char[] {'y', 'n', 'Y', 'N'};
-    Array.Copy(optionArray, 0, menuOptionsArray, 0, 4);
+    Array.Copy(optionArray, 0, menuOptionsArray, 0, 5);
 
     do
     {
@@ -31,8 +31,9 @@ try
         Console.WriteLine("Enter an option or 'q' to quit:");
         Console.WriteLine("1) Add a record");
         Console.WriteLine("2) Edit a record");
-        Console.WriteLine("3) Display records");
-        Console.WriteLine("4) Delete a record");
+        Console.WriteLine("3) Display products");
+        Console.WriteLine("4) Search records");
+        Console.WriteLine("5) Delete a record");
         option = Inputs.GetChar("> ", optionArray);
         logger.Info("User choice: {option}", option);
 
@@ -57,26 +58,44 @@ try
             case '3':
             Console.Clear();
             Console.WriteLine("Display what records? ('q' to quit)");
-            Console.WriteLine("1) Products");
-            Console.WriteLine("2) Categories");
+            Console.WriteLine("1) All Products");
+            Console.WriteLine("2) Products by category");
             char displayOption = Inputs.GetChar("> ", new char[] {'1', '2', 'q', 'Q'});
             if (displayOption == '1'){
                 DisplayProduct(db);
                 Console.WriteLine("Press any key to continue.");
                 Console.ReadKey();
             } else if (displayOption == '2') {
-                DisplayCategory(db); 
+                var searchCategory = GetCategory(db, logger);
+                logger.Info($"Searching products by: [{searchCategory.CategoryName}]");
+                var productByCategory = db.Products.OrderBy(p => p.ProductId).Where(p => p.Category == searchCategory);
+                foreach (Product p in productByCategory) {
+                    if (p.Discontinued == true) {
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.WriteLine($"{p.ProductId}: {p.ProductName}");
+                        Console.ResetColor();
+                    } else {
+                        Console.WriteLine($"{p.ProductId}: {p.ProductName}");
+                    }
+                }
                 Console.WriteLine("Press any key to continue.");
                 Console.ReadKey();
-            } else {
-                break;
             }
             break; 
+
+
+
+            // Search through products
+            case '4':
+            Console.Clear();
+            break;
+
+
 
             // Delete records
             // Delete from Product or Category table
             // Make sure to account for any orphaned records on other tables
-            case '4':
+            case '5':
             Console.Clear();
             break;
 
@@ -141,8 +160,9 @@ static void DisplayCategory(NWContext db) {
 static Category GetCategory(NWContext db, Logger logger) {
     var categories = db.Categories.OrderBy(c => c.CategoryId);
     foreach (Category c in categories) {
-        Console.WriteLine($"{c.CategoryName}");
+        Console.WriteLine($"{c.CategoryId}: {c.CategoryName}");
     }
+    Console.Write("Enter a category ID > ");
     if (int.TryParse(Console.ReadLine(), out int CategoryId)) {
         Category category = db.Categories.FirstOrDefault(c => c.CategoryId == CategoryId);
         if (category != null) {
