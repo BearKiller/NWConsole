@@ -1,4 +1,5 @@
 ﻿using NLog;
+using Helper;
 using System.Linq;
 using NWConsole.Model;
 using System.Collections.Generic;
@@ -15,99 +16,48 @@ logger.Info("Program started");
 try
 {
     var db = new NWContext();
-    string choice;
+    char option;
+    // Update this array with each menu option added
+    char[] optionArray = new char[] {'1', '2', '3', '4'};
     do
     {
-        Console.WriteLine("1) Display Categories");
-        Console.WriteLine("2) Add Category");
-        Console.WriteLine("3) Display Category and related products");
-        Console.WriteLine("4) Display all Categories and their related products");
-        Console.WriteLine("\"q\" to quit");
-        choice = Console.ReadLine();
-        Console.Clear();
-        logger.Info($"Option {choice} selected");
-        if (choice == "1")
-        {
-            var query = db.Categories.OrderBy(p => p.CategoryName);
+        // Main user menu
+        Console.WriteLine("Enter an option:");
+        Console.WriteLine("1) Add a record");
+        Console.WriteLine("2) Edit a record");
+        Console.WriteLine("3) Display records");
+        Console.WriteLine("4) Delete a record");
+        Console.WriteLine("Enter anything else to quit.");
+        option = Inputs.GetChar("> ", optionArray);
+        logger.Info("User choice: {option}", option);
 
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine($"{query.Count()} records returned");
-            Console.ForegroundColor = ConsoleColor.Magenta;
-            foreach (var item in query)
-            {
-                Console.WriteLine($"{item.CategoryName} - {item.Description}");
-            }
-            Console.ForegroundColor = ConsoleColor.White;
-        }
-        else if (choice == "2")
-        {
-            Category category = new Category();
-            Console.WriteLine("Enter Category Name:");
-            category.CategoryName = Console.ReadLine();
-            Console.WriteLine("Enter the Category Description:");
-            category.Description = Console.ReadLine();
-            ValidationContext context = new ValidationContext(category, null, null);
-            List<ValidationResult> results = new List<ValidationResult>();
+        switch(option) {
 
-            var isValid = Validator.TryValidateObject(category, context, results, true);
-            if (isValid)
-            {
-                // check for unique name
-                if (db.Categories.Any(c => c.CategoryName == category.CategoryName))
-                {
-                    // generate validation error
-                    isValid = false;
-                    results.Add(new ValidationResult("Name exists", new string[] { "CategoryName" }));
-                }
-                else
-                {
-                    logger.Info("Validation passed");
-                    // TODO: save category to db
-                }
-            }
-            if (!isValid)
-            {
-                foreach (var result in results)
-                {
-                    logger.Error($"{result.MemberNames.First()} : {result.ErrorMessage}");
-                }
-            }
-        }
-        else if (choice == "3")
-        {
-            var query = db.Categories.OrderBy(p => p.CategoryId);
+            // Add records
+            // Choose whether to add a Product or Category
+            case '1':
+            break;
 
-            Console.WriteLine("Select the category whose products you want to display:");
-            Console.ForegroundColor = ConsoleColor.DarkRed;
-            foreach (var item in query)
-            {
-                Console.WriteLine($"{item.CategoryId}) {item.CategoryName}");
-            }
-            Console.ForegroundColor = ConsoleColor.White;
-            int id = int.Parse(Console.ReadLine());
-            Console.Clear();
-            logger.Info($"CategoryId {id} selected");
-            Category category = db.Categories.Include("Products").FirstOrDefault(c => c.CategoryId == id);
-            Console.WriteLine($"{category.CategoryName} - {category.Description}");
-            foreach (Product p in category.Products)
-            {
-                Console.WriteLine($"\t{p.ProductName}");
-            }
+            // Edit records
+            // Choose whether to edit Products or Categories
+            case '2':
+            break;
+
+            // Display records
+            // Add options to search or display all records or search by category
+            // Ask if user wants to search through discontinued products as well
+            // Color discontinued products red
+            case '3':
+            break; 
+
+            // Delete records
+            // Delete from Product or Category table
+            // Make sure to account for any orphaned records on other tables
+            case '4':
+            break;
+
         }
-        else if (choice == "4")
-        {
-            var query = db.Categories.Include("Products").OrderBy(p => p.CategoryId);
-            foreach (var item in query)
-            {
-                Console.WriteLine($"{item.CategoryName}");
-                foreach (Product p in item.Products)
-                {
-                    Console.WriteLine($"\t{p.ProductName}");
-                }
-            }
-        }
-        Console.WriteLine();
-    } while (choice.ToLower() != "q");
+    } while (optionArray.Contains(option));
 }
 catch (Exception ex)
 {
