@@ -21,6 +21,7 @@ try
     // Update this array with each menu option added
     char[] optionArray = new char[] {'1', '2', '3', '4', 'q', 'Q'};
     char[] menuOptionsArray = new char[4];
+    char[] optionYN = new char[] {'y', 'n', 'Y', 'N'};
     Array.Copy(optionArray, 0, menuOptionsArray, 0, 4);
 
     do
@@ -64,7 +65,7 @@ try
                 Console.WriteLine("Press any key to continue.");
                 Console.ReadKey();
             } else if (displayOption == '2') {
-                DisplayCategory(db);
+                DisplayCategory(db); 
                 Console.WriteLine("Press any key to continue.");
                 Console.ReadKey();
             } else {
@@ -93,9 +94,17 @@ logger.Info("Program ended");
 
 // Displays a list of all products by their IDs
 static void DisplayProduct(NWContext db) {
-    var products = db.Products.OrderBy(p => p.ProductId);
-    foreach (Product p in products) {
-        Console.WriteLine($"{p.ProductId}: {p.ProductName}");
+    char showDiscontinued = Inputs.GetChar("Show discontinued items? (y/n)", new char[] {'y', 'n'});
+    if (showDiscontinued == 'y') {
+        var products = db.Products.OrderBy(p => p.ProductId);
+        foreach (Product p in products) {
+            Console.WriteLine($"{p.ProductId}: {p.ProductName}");
+        }
+    } else {
+        var products = db.Products.OrderBy(p => p.ProductId).Where(p => p.Discontinued == false);
+        foreach (Product p in products) {
+            Console.WriteLine($"{p.ProductId}: {p.ProductName}");
+        }
     }
 }
 
