@@ -98,7 +98,13 @@ static void DisplayProduct(NWContext db) {
     if (showDiscontinued == 'y') {
         var products = db.Products.OrderBy(p => p.ProductId);
         foreach (Product p in products) {
-            Console.WriteLine($"{p.ProductId}: {p.ProductName}");
+            if (p.Discontinued == true) {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine($"{p.ProductId}: {p.ProductName}");
+                Console.ResetColor();
+            } else {
+                Console.WriteLine($"{p.ProductId}: {p.ProductName}");
+            }
         }
     } else {
         var products = db.Products.OrderBy(p => p.ProductId).Where(p => p.Discontinued == false);
