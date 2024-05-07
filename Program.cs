@@ -26,6 +26,7 @@ try
     do
     {
         // Main user menu
+        Console.Clear();
         Console.WriteLine("Enter an option or 'q' to quit:");
         Console.WriteLine("1) Add a record");
         Console.WriteLine("2) Edit a record");
@@ -54,6 +55,21 @@ try
             // Color discontinued products red
             case '3':
             Console.Clear();
+            Console.WriteLine("Display what records? ('q' to quit)");
+            Console.WriteLine("1) Products");
+            Console.WriteLine("2) Categories");
+            char displayOption = Inputs.GetChar("> ", new char[] {'1', '2', 'q', 'Q'});
+            if (displayOption == '1'){
+                DisplayProduct(db);
+                Console.WriteLine("Press any key to continue.");
+                Console.ReadKey();
+            } else if (displayOption == '2') {
+                DisplayCategory(db);
+                Console.WriteLine("Press any key to continue.");
+                Console.ReadKey();
+            } else {
+                break;
+            }
             break; 
 
             // Delete records
@@ -76,22 +92,36 @@ logger.Info("Program ended");
 
 
 // Displays a list of all products by their IDs
+static void DisplayProduct(NWContext db) {
+    var products = db.Products.OrderBy(p => p.ProductId);
+    foreach (Product p in products) {
+        Console.WriteLine($"{p.ProductId}: {p.ProductName}");
+    }
+}
+
 static Product GetProduct(NWContext db, Logger logger) {
     var products = db.Products.OrderBy(p => p.ProductId);
     foreach (Product p in products) {
-        Console.WriteLine($"{p.ProductId}: {p.ProductName}");    
+        Console.WriteLine($"{p.ProductId}: {p.ProductName}");
     }
     if (int.TryParse(Console.ReadLine(), out int ProductId)) {
         Product product = db.Products.FirstOrDefault(p => p.ProductId == ProductId);
-        if (product != null) {
-            return product;
-        }
+    if (product != null) {
+        return product;
     }
+}
     logger.Error("Invalid Product ID");
     return null;
 }
 
 
+
+static void DisplayCategory(NWContext db) {
+    var categories = db.Categories.OrderBy(c => c.CategoryId);
+    foreach (Category c in categories) {
+        Console.WriteLine($"{c.CategoryName}");
+    }
+}
 
 static Category GetCategory(NWContext db, Logger logger) {
     var categories = db.Categories.OrderBy(c => c.CategoryId);
