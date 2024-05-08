@@ -13,8 +13,7 @@ string path = Directory.GetCurrentDirectory() + $"{Path.DirectorySeparatorChar}n
 var logger = LogManager.LoadConfiguration(path).GetCurrentClassLogger();
 logger.Info("Program started");
 
-try
-{
+try {
     var db = new NWContext();
     char option;
 
@@ -24,8 +23,7 @@ try
     char[] optionYN = new char[] {'y', 'n', 'Y', 'N'};
     Array.Copy(optionArray, 0, menuOptionsArray, 0, 5);
 
-    do
-    {
+    do {
         // Main user menu
         Console.Clear();
         Console.WriteLine("Enter an option or 'q' to quit:");
@@ -76,6 +74,7 @@ try
                     }
 
                 }
+
             // Creates a new category
             } else if (addOption == '2') {
                 var categoryName = Inputs.GetString("Enter a new category name > ");
@@ -118,7 +117,7 @@ try
             // Color discontinued products red
             case '3':
             Console.Clear();
-            Console.WriteLine("Display what records? ('q' to quit)");
+            Console.WriteLine("Display what products? ('q' to quit)");
             Console.WriteLine("1) All Products");
             Console.WriteLine("2) Products by category");
             char displayOption = Inputs.GetChar("> ", new char[] {'1', '2', 'q', 'Q'});
@@ -183,10 +182,12 @@ static void DisplayProduct(NWContext db) {
         foreach (Product p in products) {
             if (p.Discontinued == true) {
                 Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine($"{p.ProductId}: {p.ProductName}");
+                string formattedUnitPrice = string.Format("{0:C}", p.UnitPrice);
+                Console.WriteLine($"{p.ProductId,3}: {p.ProductName,40} | Price: {formattedUnitPrice,10} | Quantity: {p.QuantityPerUnit,-25} | Stock: {p.UnitsInStock,4}");
                 Console.ResetColor();
             } else {
-                Console.WriteLine($"{p.ProductId}: {p.ProductName}");
+                string formattedUnitPrice = string.Format("{0:C}", p.UnitPrice);
+                Console.WriteLine($"{p.ProductId,3}: {p.ProductName,40} | Price: {formattedUnitPrice,10} | Quantity: {p.QuantityPerUnit,-25} | Stock: {p.UnitsInStock,4}");
             }
         }
     } else {
