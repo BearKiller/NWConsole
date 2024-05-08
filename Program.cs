@@ -50,7 +50,7 @@ try
 
             // Creates a new product
             if (addOption == '1') {
-                var productName = Inputs.GetString("Enter a product name > ");
+                var productName = Inputs.GetString("Enter a new product name > ");
                 ValidationContext context = new ValidationContext(productName, null, null);
                 List<ValidationResult> results = new List<ValidationResult>();
 
@@ -59,6 +59,8 @@ try
                     if (db.Products.Any(p => p.ProductName == productName)) {
                         isValid = false;
                         results.Add(new ValidationResult("Product name already exists", new string[] { "Name" }));
+                        Console.WriteLine("Press any key to continue.");
+                        Console.ReadKey();
                     } else {
                         logger.Info("Validation passed");
                         var productCategory = GetCategory(db, logger);
@@ -76,7 +78,27 @@ try
                 }
             // Creates a new category
             } else if (addOption == '2') {
+                var categoryName = Inputs.GetString("Enter a new category name > ");
+                ValidationContext context = new ValidationContext(categoryName, null, null);
+                List<ValidationResult> results = new List<ValidationResult>();
 
+                var isValid = Validator.TryValidateObject(categoryName, context, results, true);
+                if (isValid) {
+                    if (db.Categories.Any(c => c.CategoryName == categoryName)) {
+                        isValid = false;
+                        results.Add(new ValidationResult("Category name already exists", new string[] { "Name" }));
+                        Console.WriteLine("Press any key to continue.");
+                        Console.ReadKey();
+                    } else {
+                        logger.Info("Validation passed");
+                        string categoryDescription = Inputs.GetString("Enter a category description: ");
+                        var category = new Category {
+                            CategoryName = categoryName,
+                            Description = categoryDescription};
+                        db.AddCategories(category);
+                        logger.Info("Category added = {name}", category.CategoryName);
+                    }
+                }
             }
             break;
 
