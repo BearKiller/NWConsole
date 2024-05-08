@@ -54,6 +54,46 @@ namespace Helper
             return returnValue;
         }
 
+        public static short GetShort(string prompt) {
+            string path = Directory.GetCurrentDirectory() + $"{Path.DirectorySeparatorChar}nlog.config";
+            var logger = LogManager.LoadConfiguration(path).GetCurrentClassLogger();
+            bool isSuccess = false;
+            short returnValue = 0;
+
+            do {
+                Console.Write(prompt);
+                string userInput = Console.ReadLine();
+
+                isSuccess = Int16.TryParse(userInput, out returnValue);
+
+                if (!isSuccess) {
+                    logger.Error("Input must be a 16 bit integer");
+                }
+            } while (!isSuccess);
+            return returnValue;
+        }
+
+        public static bool GetBool(string prompt) {
+            string path = Directory.GetCurrentDirectory() + $"{Path.DirectorySeparatorChar}nlog.config";
+            var logger = LogManager.LoadConfiguration(path).GetCurrentClassLogger();
+            bool isSuccess = false;
+            bool returnValue = false;
+
+            do {
+                Console.Write(prompt);
+                string userInput = Console.ReadLine();
+
+                isSuccess = Boolean.TryParse(userInput, out returnValue);
+
+                if (!isSuccess) {
+                    logger.Error("Please enter either True or False");
+                }
+
+            } while (!isSuccess);
+
+            return returnValue;      
+        }
+
         public static string GetString(string prompt) {
 
             string path = Directory.GetCurrentDirectory() + $"{Path.DirectorySeparatorChar}nlog.config";

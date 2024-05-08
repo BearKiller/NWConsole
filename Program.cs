@@ -107,6 +107,35 @@ try {
             // Choose whether to edit Products or Categories
             case '2':
             Console.Clear();
+            Console.WriteLine("Edit what records? ('q' to quit)");
+            Console.WriteLine("1) Products");
+            Console.WriteLine("2) Categories");
+            char editOption = Inputs.GetChar("> ", new char[] {'1', '2', 'q', 'Q'});
+
+            // Edits a product
+            if (editOption == '1'){
+                var product = GetProduct(db, logger);
+                if (product != null) {
+                    Product editedProduct = InputProduct(db, logger);
+                    if (editedProduct != null) {
+                        editedProduct.ProductId = product.ProductId;
+                        editedProduct.Discontinued = Inputs.GetBool("Discontinued? (True/False) > ");
+                        var productCategory = GetCategory(db, logger);
+                        editedProduct.CategoryId = productCategory.CategoryId;
+                        editedProduct.UnitPrice = Inputs.GetDecimal("Enter unit price > ");
+                        editedProduct.QuantityPerUnit = Inputs.GetString("Enter quantity per unit > ");
+                        editedProduct.UnitsInStock = Inputs.GetShort("Enter units in stock > ");
+                        editedProduct.UnitsOnOrder = Inputs.GetShort("Enter units on order > ");
+                        editedProduct.ReorderLevel = Inputs.GetShort("Enter reorder level > ");
+                        db.EditProduct(editedProduct);
+                        logger.Info($"Product {product.ProductId}: {product.ProductName} updated");
+                    }
+                }
+
+            // Edits a category
+            } else if (editOption == '2') {
+
+            }
             break;
 
 
@@ -214,6 +243,23 @@ static Product GetProduct(NWContext db, Logger logger) {
     return null;
 }
 
+static Product InputProduct(NWContext db, Logger logger) {
+    Product product = new Product();
+    product.ProductName = Inputs.GetString("Enter the product name: ");
+
+    ValidationContext context = new ValidationContext(product, null, null);
+    List<ValidationResult> results = new List<ValidationResult> ();
+
+    var isValid = Validator.TryValidateObject(product, context, results, true);
+    if (isValid) {
+        return product;
+    } else {
+        foreach (var result in results) {
+            logger.Error($"{result.MemberNames.First()} : {result.ErrorMessage}");
+        }
+    }
+    return null;
+}
 
 
 // Displays all categories

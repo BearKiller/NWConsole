@@ -14,6 +14,19 @@ namespace NWConsole.Model
             this.SaveChanges();
         }
 
+        public void EditProduct(Product editedProduct) {
+            Product product = this.Products.Find(editedProduct.ProductId);
+            product.ProductName = editedProduct.ProductName;
+            product.CategoryId = editedProduct.CategoryId;
+            product.QuantityPerUnit = editedProduct.QuantityPerUnit;
+            product.UnitPrice = editedProduct.UnitPrice;
+            product.UnitsInStock = editedProduct.UnitsInStock;
+            product.UnitsOnOrder = editedProduct.UnitsOnOrder;
+            product.ReorderLevel = editedProduct.ReorderLevel;
+            product.Discontinued = editedProduct.Discontinued;
+            this.SaveChanges();
+        }
+
         public void AddCategories(Category category) {
             this.Categories.Add(category);
             this.SaveChanges();
