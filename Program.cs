@@ -29,7 +29,7 @@ try {
         Console.WriteLine("Enter an option or 'q' to quit:");
         Console.WriteLine("1) Add a record");
         Console.WriteLine("2) Edit a record");
-        Console.WriteLine("3) Display products");
+        Console.WriteLine("3) Display records");
         Console.WriteLine("4) Search records");
         Console.WriteLine("5) Delete a record");
         option = Inputs.GetChar("> ", optionArray);
@@ -129,6 +129,8 @@ try {
                         editedProduct.ReorderLevel = Inputs.GetShort("Enter reorder level > ");
                         db.EditProduct(editedProduct);
                         logger.Info($"Product {product.ProductId}: {product.ProductName} updated");
+                        Console.WriteLine("Press any key to continue.");
+                        Console.ReadKey();
                     }
                 }
 
@@ -143,6 +145,8 @@ try {
                         editedCategory.Description = Inputs.GetString("Enter a description: ");
                         db.EditCategory(editedCategory);
                         logger.Info($"Category {category.CategoryName} updated");
+                        Console.WriteLine("Press any key to continue.");
+                        Console.ReadKey();
                     }
                 }
             }
@@ -156,10 +160,11 @@ try {
             // Color discontinued products red
             case '3':
             Console.Clear();
-            Console.WriteLine("Display what products? ('q' to quit)");
+            Console.WriteLine("Display what records? ('q' to quit)");
             Console.WriteLine("1) All Products");
             Console.WriteLine("2) Products by category");
-            char displayOption = Inputs.GetChar("> ", new char[] {'1', '2', 'q', 'Q'});
+            Console.WriteLine("3) All categories");
+            char displayOption = Inputs.GetChar("> ", new char[] {'1', '2', '3', 'q', 'Q'});
 
             // Displays all products
             if (displayOption == '1'){
@@ -183,7 +188,11 @@ try {
                 }
                 Console.WriteLine("Press any key to continue.");
                 Console.ReadKey();
-            } 
+            } else if (displayOption == '3') {
+                DisplayCategory(db);
+                Console.WriteLine("Press any key to continue.");
+                Console.ReadKey();
+            }
             break;
 
 
@@ -273,11 +282,12 @@ static Product InputProduct(NWContext db, Logger logger) {
 }
 
 
+
 // Displays all categories
 static void DisplayCategory(NWContext db) {
     var categories = db.Categories.OrderBy(c => c.CategoryId);
     foreach (Category c in categories) {
-        Console.WriteLine($"{c.CategoryName}");
+        Console.WriteLine($"{c.CategoryName,-20} | {c.Description}");
     }
 }
 
