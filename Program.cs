@@ -134,7 +134,17 @@ try {
 
             // Edits a category
             } else if (editOption == '2') {
-
+                var category = GetCategory(db, logger);
+                if (category != null) {
+                    Category editedCategory = InputCategory(db, logger);
+                    if (editedCategory != null) {
+                        editedCategory.CategoryId = category.CategoryId;
+                        editedCategory.CategoryName = Inputs.GetString("Enter a name for the category: ");
+                        editedCategory.Description = Inputs.GetString("Enter a description: ");
+                        db.EditCategory(editedCategory);
+                        logger.Info($"Category {category.CategoryName} updated");
+                    }
+                }
             }
             break;
 
@@ -243,6 +253,7 @@ static Product GetProduct(NWContext db, Logger logger) {
     return null;
 }
 
+// Returns a product and verifies a unique name
 static Product InputProduct(NWContext db, Logger logger) {
     Product product = new Product();
     product.ProductName = Inputs.GetString("Enter the product name: ");
@@ -284,5 +295,24 @@ static Category GetCategory(NWContext db, Logger logger) {
         }
     }
     logger.Error("Invalid Category ID");
+    return null;
+}
+
+// Returns a category and verifies a unique name
+static Category InputCategory(NWContext db, Logger logger) {
+    Category category = new Category();
+    category.CategoryName = Inputs.GetString("Enter the category name: ");
+
+    ValidationContext context = new ValidationContext(category, null, null);
+    List<ValidationResult> results = new List<ValidationResult> ();
+
+    var isValid = Validator.TryValidateObject(category, context, results, true);
+    if (isValid) {
+        return category;
+    } else {
+        foreach (var result in results) {
+            logger.Error($"{result.MemberNames.First()} : {result.ErrorMessage}");
+        }
+    }
     return null;
 }

@@ -31,6 +31,14 @@ namespace NWConsole.Model
             this.Categories.Add(category);
             this.SaveChanges();
         }
+
+        public void EditCategory(Category editedCategory) {
+            Category category = this.Categories.Find(editedCategory.CategoryId);
+            category.CategoryName = editedCategory.CategoryName;
+            category.Description = editedCategory.Description;
+            this.SaveChanges();
+        }
+        
         public NWContext()
         {
         }
