@@ -178,6 +178,10 @@ try {
                 var searchCategory = GetCategory(db, logger);
                 Console.Clear();
                 logger.Info($"Searching products by: [{searchCategory.CategoryName}]");
+                Console.BackgroundColor = ConsoleColor.DarkBlue;
+                Console.ForegroundColor = ConsoleColor.White;
+                Console.WriteLine($"{searchCategory.CategoryName}");
+                Console.ResetColor();
                 var productByCategory = db.Products.OrderBy(p => p.ProductId).Where(p => p.Category == searchCategory);
                 foreach (Product p in productByCategory) {
                     if (p.Discontinued == false) {
@@ -186,6 +190,8 @@ try {
                 }
                 Console.WriteLine("Press any key to continue.");
                 Console.ReadKey();
+
+            // Displays list of categories
             } else if (displayOption == '3') {
                 Console.Clear();
                 DisplayCategory(db);
@@ -198,6 +204,22 @@ try {
             // Search through products
             case '4':
             Console.Clear();
+            string query = Inputs.GetString("Search for product name > ");
+            var queryProducts = from p in db.Products
+                join c in db.Categories on p.CategoryId equals c.CategoryId
+                where p.ProductName.Contains(query)
+                select new { Record = $"{p.ProductId,3}: {p.ProductName,-40} | {p.UnitPrice,8:C} | {p.QuantityPerUnit,-20} | {p.UnitsInStock,4}", CategoryName = c.CategoryName};
+                
+            Console.WriteLine($"{queryProducts.Count()} products match your search criteria");
+            Console.BackgroundColor= ConsoleColor.DarkBlue;
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.WriteLine("  ID                Product                        Price         Quantity          Stock    Category  ");
+            Console.ResetColor();
+            foreach (var p in queryProducts) {
+                Console.WriteLine($" {p.Record} | {p.CategoryName,12}");
+            }
+            Console.WriteLine("Press any key to continue.");
+            Console.ReadKey();
             break;
 
 
