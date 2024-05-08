@@ -7,8 +7,17 @@ using Microsoft.Extensions.Configuration.Json;
 
 namespace NWConsole.Model
 {
-    public partial class NWContext : DbContext
-    {
+    public partial class NWContext : DbContext {
+
+        public void AddProduct(Product product) {
+            this.Products.Add(product);
+            this.SaveChanges();
+        }
+
+        public void AddCategories(Category category) {
+            this.Categories.Add(category);
+            this.SaveChanges();
+        }
         public NWContext()
         {
         }

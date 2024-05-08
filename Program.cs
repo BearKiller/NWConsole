@@ -43,13 +43,52 @@ try
             // Choose whether to add a Product or Category
             case '1':
             Console.Clear();
+            Console.WriteLine("Add a product or category? ('q' to quit)");
+            Console.WriteLine("1) Product");
+            Console.WriteLine("2) Category");
+            char addOption = Inputs.GetChar("> ", new char[] {'1', '2', 'q', 'Q'});
+
+            // Creates a new product
+            if (addOption == '1') {
+                var productName = Inputs.GetString("Enter a product name > ");
+                ValidationContext context = new ValidationContext(productName, null, null);
+                List<ValidationResult> results = new List<ValidationResult>();
+
+                var isValid = Validator.TryValidateObject(productName, context, results, true);
+                if (isValid) {
+                    if (db.Products.Any(p => p.ProductName == productName)) {
+                        isValid = false;
+                        results.Add(new ValidationResult("Product name already exists", new string[] { "Name" }));
+                    } else {
+                        logger.Info("Validation passed");
+                        var productCategory = GetCategory(db, logger);
+                        string productQuantity = Inputs.GetString("Enter quantity per unit > ");
+                        decimal? productPrice = Inputs.GetDecimal("Enter product price > ");
+                        var product = new Product {
+                            ProductName = productName,
+                            CategoryId = productCategory.CategoryId,
+                            QuantityPerUnit = productQuantity,
+                            UnitPrice = productPrice};
+                        db.AddProduct(product);
+                        logger.Info("Product added = {name}", product.ProductName);
+                    }
+
+                }
+            // Creates a new category
+            } else if (addOption == '2') {
+
+            }
             break;
+
+
 
             // Edit records
             // Choose whether to edit Products or Categories
             case '2':
             Console.Clear();
             break;
+
+
 
             // Display records
             // Add options to search or display all records or search by category
@@ -61,10 +100,14 @@ try
             Console.WriteLine("1) All Products");
             Console.WriteLine("2) Products by category");
             char displayOption = Inputs.GetChar("> ", new char[] {'1', '2', 'q', 'Q'});
+
+            // Displays all products
             if (displayOption == '1'){
                 DisplayProduct(db);
                 Console.WriteLine("Press any key to continue.");
                 Console.ReadKey();
+
+            // Displays products by category
             } else if (displayOption == '2') {
                 var searchCategory = GetCategory(db, logger);
                 logger.Info($"Searching products by: [{searchCategory.CategoryName}]");
@@ -80,9 +123,8 @@ try
                 }
                 Console.WriteLine("Press any key to continue.");
                 Console.ReadKey();
-            }
-            break; 
-
+            } 
+            break;
 
 
             // Search through products
@@ -133,6 +175,7 @@ static void DisplayProduct(NWContext db) {
     }
 }
 
+// Returns a product ID
 static Product GetProduct(NWContext db, Logger logger) {
     var products = db.Products.OrderBy(p => p.ProductId);
     foreach (Product p in products) {
@@ -150,6 +193,7 @@ static Product GetProduct(NWContext db, Logger logger) {
 
 
 
+// Displays all categories
 static void DisplayCategory(NWContext db) {
     var categories = db.Categories.OrderBy(c => c.CategoryId);
     foreach (Category c in categories) {
@@ -157,6 +201,7 @@ static void DisplayCategory(NWContext db) {
     }
 }
 
+// Returns a category ID
 static Category GetCategory(NWContext db, Logger logger) {
     var categories = db.Categories.OrderBy(c => c.CategoryId);
     foreach (Category c in categories) {

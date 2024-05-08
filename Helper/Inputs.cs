@@ -25,12 +25,33 @@ namespace Helper
                 isSuccess = Int32.TryParse(userInput, out returnValue);
 
                 if (!isSuccess) {
-                    logger.Error("");
+                    logger.Error("Input must be an integer.");
                 }
                 
             } while (!isSuccess);
             return returnValue;
 
+        }
+
+        public static decimal GetDecimal(string prompt) {
+
+            string path = Directory.GetCurrentDirectory() + $"{Path.DirectorySeparatorChar}nlog.config";
+            var logger = LogManager.LoadConfiguration(path).GetCurrentClassLogger();
+            bool isSuccess = false;
+            decimal returnValue = 0;
+            
+            do {
+                Console.Write(prompt);
+                string userInput = Console.ReadLine();
+
+                isSuccess = Decimal.TryParse(userInput, out returnValue);
+
+                if (!isSuccess) {
+                    logger.Error("Input must be a decimal.");
+                }
+                
+            } while (!isSuccess);
+            return returnValue;
         }
 
         public static string GetString(string prompt) {
