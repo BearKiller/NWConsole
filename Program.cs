@@ -168,6 +168,7 @@ try {
 
             // Displays all products
             if (displayOption == '1'){
+                Console.Clear();
                 DisplayProduct(db);
                 Console.WriteLine("Press any key to continue.");
                 Console.ReadKey();
@@ -175,20 +176,18 @@ try {
             // Displays products by category
             } else if (displayOption == '2') {
                 var searchCategory = GetCategory(db, logger);
+                Console.Clear();
                 logger.Info($"Searching products by: [{searchCategory.CategoryName}]");
                 var productByCategory = db.Products.OrderBy(p => p.ProductId).Where(p => p.Category == searchCategory);
                 foreach (Product p in productByCategory) {
-                    if (p.Discontinued == true) {
-                        Console.ForegroundColor = ConsoleColor.Red;
+                    if (p.Discontinued == false) {
                         Console.WriteLine($"{p.ProductId}: {p.ProductName}");
-                        Console.ResetColor();
-                    } else {
-                        Console.WriteLine($"{p.ProductId}: {p.ProductName}");
-                    }
+                    } 
                 }
                 Console.WriteLine("Press any key to continue.");
                 Console.ReadKey();
             } else if (displayOption == '3') {
+                Console.Clear();
                 DisplayCategory(db);
                 Console.WriteLine("Press any key to continue.");
                 Console.ReadKey();
