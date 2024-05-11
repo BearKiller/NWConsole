@@ -27,6 +27,11 @@ namespace NWConsole.Model
             this.SaveChanges();
         }
 
+        public void DeleteProduct(Product product) {
+            this.Products.Remove(product);
+            this.SaveChanges();
+        }
+
         public void AddCategories(Category category) {
             this.Categories.Add(category);
             this.SaveChanges();
@@ -36,6 +41,11 @@ namespace NWConsole.Model
             Category category = this.Categories.Find(editedCategory.CategoryId);
             category.CategoryName = editedCategory.CategoryName;
             category.Description = editedCategory.Description;
+            this.SaveChanges();
+        }
+
+        public void DeleteCategory(Category category) {
+            this.Categories.Remove(category);
             this.SaveChanges();
         }
         

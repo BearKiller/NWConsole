@@ -62,6 +62,9 @@ try {
                     } else {
                         logger.Info("Validation passed");
                         var productCategory = GetCategory(db, logger);
+                        do {
+                            productCategory = GetCategory(db, logger);
+                        } while (productCategory != null); 
                         string productQuantity = Inputs.GetString("Enter quantity per unit > ");
                         decimal? productPrice = Inputs.GetDecimal("Enter product price > ");
                         var product = new Product {
@@ -161,13 +164,14 @@ try {
             case '3':
             Console.Clear();
             Console.WriteLine("Display what records? ('q' to quit)");
-            Console.WriteLine("1) All Products");
+            Console.WriteLine("1) Products");
             Console.WriteLine("2) Products by category");
-            Console.WriteLine("3) All categories");
-            char displayOption = Inputs.GetChar("> ", new char[] {'1', '2', '3', 'q', 'Q'});
+            Console.WriteLine("3) Categories");
+            Console.WriteLine("4) Categories and their active products");
+            char displayOption = Inputs.GetChar("> ", new char[] {'1', '2', '3', '4', 'q', 'Q'});
 
             // Displays all products
-            if (displayOption == '1'){
+            if (displayOption == '1') {
                 Console.Clear();
                 DisplayProduct(db);
                 Console.WriteLine("Press any key to continue.");
@@ -197,8 +201,16 @@ try {
                 DisplayCategory(db);
                 Console.WriteLine("Press any key to continue.");
                 Console.ReadKey();
+
+            // Display categories with active products
+            } else if (displayOption == '4') {
+                Console.Clear();
+                DisplayCategoryProducts(db);
+                Console.WriteLine("Press any key to continue.");
+                Console.ReadKey();
             }
             break;
+
 
 
             // Search through products
@@ -229,9 +241,44 @@ try {
             // Make sure to account for any orphaned records on other tables
             case '5':
             Console.Clear();
+            Console.WriteLine("Delete what records? ('q' to quit)");
+            Console.WriteLine("1) Product");
+            Console.WriteLine("2) Category");
+            char deleteOption = Inputs.GetChar("> ", new char[] {'1', '2', 'q', 'Q'});
+
+            // Delete a product
+            if (deleteOption == '1') {
+                var product = GetProduct(db, logger);
+                if (product != null) {
+                    db.DeleteProduct(product);
+                    logger.Info($"Product: {product.ProductName} deleted");
+                    Console.WriteLine("Press any key to continue.");
+                    Console.ReadKey();
+                }
+            // Delete a category
+            } else if (deleteOption == '2') {
+                var category = GetCategory(db, logger);
+                if (category != null) {
+                    db.DeleteCategory(category);
+                    logger.Info($"Category: {category.CategoryName} deleted");
+                    var productsCategory = db.Products.Where(p => p.CategoryId == category.CategoryId).ToList();
+                    int i = 0;
+                    if (productsCategory.Any()) {
+                        foreach (Product p in productsCategory) {
+                            db.DeleteProduct(p);
+                            i += 1;
+                        }
+                    } else {
+                        logger.Info("No orphaned products detected.");
+                    }
+                    logger.Info($"{i} orphaned products deleted");
+                    Console.WriteLine("Press any key to continue.");
+                    Console.ReadKey();
+                } 
+            }
             break;
 
-        }
+    }
     } while (menuOptionsArray.Contains(option));
 }
 catch (Exception ex)
@@ -309,6 +356,25 @@ static void DisplayCategory(NWContext db) {
     var categories = db.Categories.OrderBy(c => c.CategoryId);
     foreach (Category c in categories) {
         Console.WriteLine($"{c.CategoryName,-20} | {c.Description}");
+    }
+}
+
+// Displays all categories with their active products
+static void DisplayCategoryProducts(NWContext db) {
+    var categories = db.Categories.OrderBy(c => c.CategoryId).ToList();
+    foreach (var c in categories) {
+        Console.ForegroundColor = ConsoleColor.Blue;
+        Console.WriteLine($"{c.CategoryName}");
+        Console.ResetColor();
+        var productsCategory = db.Products.Where(p => p.CategoryId == c.CategoryId && p.Discontinued == false).ToList();
+        if (productsCategory.Any()) {
+            foreach (Product p in productsCategory) {
+                Console.WriteLine($"  {p.ProductId}: {p.ProductName}");
+            }
+        } else {
+            Console.WriteLine("No active products found in this category.");
+        }
+        Console.WriteLine();
     }
 }
 
