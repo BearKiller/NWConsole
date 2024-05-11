@@ -62,10 +62,12 @@ try {
                     } else {
                         logger.Info("Validation passed");
                         var productCategory = GetCategory(db, logger);
-                        do {
-                            logger.Error("Product must belong to a category to continue");
-                            productCategory = GetCategory(db, logger);
-                        } while (productCategory == null); 
+                        if (productCategory == null) {
+                            do {
+                                logger.Error("Product must belong to a category to continue");
+                                productCategory = GetCategory(db, logger);
+                            } while (productCategory == null); 
+                        }
                         string productQuantity = Inputs.GetString("Enter quantity per unit > ");
                         decimal? productPrice = Inputs.GetDecimal("Enter product price > ");
                         var product = new Product {
@@ -264,18 +266,19 @@ try {
             } else if (deleteOption == '2') {
                 var category = GetCategory(db, logger);
                 if (category != null) {
-                    db.DeleteCategory(category);
-                    logger.Info($"Category: {category.CategoryName} deleted");
                     var productsCategory = db.Products.Where(p => p.CategoryId == category.CategoryId).ToList();
                     int i = 0;
                     if (productsCategory.Any()) {
                         foreach (Product p in productsCategory) {
+                            logger.Info($"Orphaned product: {p.ProductName} deleted");
                             db.DeleteProduct(p);
                             i += 1;
                         }
                     } else {
                         logger.Info("No orphaned products detected.");
                     }
+                    db.DeleteCategory(category);
+                    logger.Info($"Category: {category.CategoryName} deleted");
                     logger.Info($"{i} orphaned products deleted");
                     Console.WriteLine("Press any key to continue.");
                     Console.ReadKey();
@@ -283,7 +286,7 @@ try {
             }
             break;
 
-    }
+        }
     } while (menuOptionsArray.Contains(option));
 }
 catch (Exception ex)
