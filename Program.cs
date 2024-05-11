@@ -63,8 +63,9 @@ try {
                         logger.Info("Validation passed");
                         var productCategory = GetCategory(db, logger);
                         do {
+                            logger.Error("Product must belong to a category to continue");
                             productCategory = GetCategory(db, logger);
-                        } while (productCategory != null); 
+                        } while (productCategory == null); 
                         string productQuantity = Inputs.GetString("Enter quantity per unit > ");
                         decimal? productPrice = Inputs.GetDecimal("Enter product price > ");
                         var product = new Product {
@@ -180,6 +181,10 @@ try {
             // Displays products by category
             } else if (displayOption == '2') {
                 var searchCategory = GetCategory(db, logger);
+                do {
+                    logger.Error("Enter a valid category ID to continue");
+                    searchCategory = GetCategory(db, logger);
+                } while (searchCategory == null); 
                 Console.Clear();
                 logger.Info($"Searching products by: [{searchCategory.CategoryName}]");
                 Console.BackgroundColor = ConsoleColor.DarkBlue;
@@ -189,7 +194,7 @@ try {
                 var productByCategory = db.Products.OrderBy(p => p.ProductId).Where(p => p.Category == searchCategory);
                 foreach (Product p in productByCategory) {
                     if (p.Discontinued == false) {
-                        Console.WriteLine($"{p.ProductId}: {p.ProductName}");
+                        Console.WriteLine($" {p.ProductId}: {p.ProductName}");
                     } 
                 }
                 Console.WriteLine("Press any key to continue.");
