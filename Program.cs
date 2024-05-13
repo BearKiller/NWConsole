@@ -18,10 +18,10 @@ try {
     char option;
 
     // Update this array with each menu option added
-    char[] optionArray = new char[] {'1', '2', '3', '4', '5', 'q', 'Q'};
-    char[] menuOptionsArray = new char[5];
+    char[] optionArray = new char[] {'1', '2', '3', '4', '5', '6', 'q', 'Q'};
+    char[] menuOptionsArray = new char[6];
     char[] optionYN = new char[] {'y', 'n', 'Y', 'N'};
-    Array.Copy(optionArray, 0, menuOptionsArray, 0, 5);
+    Array.Copy(optionArray, 0, menuOptionsArray, 0, 6);
 
     do {
         // Main user menu
@@ -30,8 +30,9 @@ try {
         Console.WriteLine("1) Add a record");
         Console.WriteLine("2) Edit a record");
         Console.WriteLine("3) Display records");
-        Console.WriteLine("4) Search records");
+        Console.WriteLine("4) Search products");
         Console.WriteLine("5) Delete a record");
+        Console.WriteLine("6) Generate inventory report");
         option = Inputs.GetChar("> ", optionArray);
         logger.Info("User choice: {option}", option);
 
@@ -48,6 +49,7 @@ try {
 
             // Creates a new product
             if (addOption == '1') {
+                Console.Clear();
                 var productName = Inputs.GetString("Enter a new product name > ");
                 ValidationContext context = new ValidationContext(productName, null, null);
                 List<ValidationResult> results = new List<ValidationResult>();
@@ -83,6 +85,7 @@ try {
 
             // Creates a new category
             } else if (addOption == '2') {
+                Console.Clear();
                 var categoryName = Inputs.GetString("Enter a new category name > ");
                 ValidationContext context = new ValidationContext(categoryName, null, null);
                 List<ValidationResult> results = new List<ValidationResult>();
@@ -120,6 +123,7 @@ try {
 
             // Edits a product
             if (editOption == '1'){
+                Console.Clear();
                 var product = GetProduct(db, logger);
                 if (product != null) {
                     Product editedProduct = InputProduct(db, logger);
@@ -142,6 +146,7 @@ try {
 
             // Edits a category
             } else if (editOption == '2') {
+                Console.Clear();
                 var category = GetCategory(db, logger);
                 if (category != null) {
                     Category editedCategory = InputCategory(db, logger);
@@ -169,22 +174,23 @@ try {
             Console.WriteLine("Display what records? ('q' to quit)");
             Console.WriteLine("1) Products");
             Console.WriteLine("2) Products by category");
-            Console.WriteLine("3) Categories");
-            Console.WriteLine("4) Categories and their active products");
-            char displayOption = Inputs.GetChar("> ", new char[] {'1', '2', '3', '4', 'q', 'Q'});
+            Console.WriteLine("3) Discontinued Products");
+            Console.WriteLine("4) Categories");
+            Console.WriteLine("5) Categories and their active products");
+            char displayOption = Inputs.GetChar("> ", new char[] {'1', '2', '3', '4', '5', 'q', 'Q'});
 
             // Displays all products
             if (displayOption == '1') {
                 Console.Clear();
-                DisplayProduct(db);
+                DisplayProduct(db, logger);
                 Console.WriteLine("Press any key to continue.");
                 Console.ReadKey();
 
             // Displays products by category
             } else if (displayOption == '2') {
-                var searchCategory = GetCategory(db, logger);
+                Console.Clear();
+                Category searchCategory = null;
                 do {
-                    logger.Error("Enter a valid category ID to continue");
                     searchCategory = GetCategory(db, logger);
                 } while (searchCategory == null); 
                 Console.Clear();
@@ -202,15 +208,22 @@ try {
                 Console.WriteLine("Press any key to continue.");
                 Console.ReadKey();
 
-            // Displays list of categories
+            // Displays discontinued products
             } else if (displayOption == '3') {
+                Console.Clear();
+                DiscontinuedProducts(db);
+                Console.WriteLine("Press any key to continue.");
+                Console.ReadKey();
+
+            // Displays list of categories
+            } else if (displayOption == '4') {
                 Console.Clear();
                 DisplayCategory(db);
                 Console.WriteLine("Press any key to continue.");
                 Console.ReadKey();
 
             // Display categories with active products
-            } else if (displayOption == '4') {
+            } else if (displayOption == '5') {
                 Console.Clear();
                 DisplayCategoryProducts(db);
                 Console.WriteLine("Press any key to continue.");
@@ -255,6 +268,7 @@ try {
 
             // Delete a product
             if (deleteOption == '1') {
+                Console.Clear();
                 var product = GetProduct(db, logger);
                 if (product != null) {
                     db.DeleteProduct(product);
@@ -264,6 +278,7 @@ try {
                 }
             // Delete a category
             } else if (deleteOption == '2') {
+                Console.Clear();
                 var category = GetCategory(db, logger);
                 if (category != null) {
                     var productsCategory = db.Products.Where(p => p.CategoryId == category.CategoryId).ToList();
@@ -286,6 +301,13 @@ try {
             }
             break;
 
+            case '6':
+            Console.Clear();
+            DisplayInventoryReport(db);
+            Console.WriteLine("Press any key to continue.");
+            Console.ReadKey();
+            break;
+
         }
     } while (menuOptionsArray.Contains(option));
 }
@@ -299,26 +321,37 @@ logger.Info("Program ended");
 
 
 // Displays a list of all products by their IDs
-static void DisplayProduct(NWContext db) {
-    char showDiscontinued = Inputs.GetChar("Show discontinued items? (y/n)", new char[] {'y', 'n'});
+static void DisplayProduct(NWContext db, Logger logger) {
+    char showDiscontinued = Inputs.GetChar("Include discontinued items? (y/n)", new char[] {'y', 'n'});
     if (showDiscontinued == 'y') {
+        logger.Info("Displaying all products");
         var products = db.Products.OrderBy(p => p.ProductId);
         foreach (Product p in products) {
             if (p.Discontinued == true) {
                 Console.ForegroundColor = ConsoleColor.Red;
                 string formattedUnitPrice = string.Format("{0:C}", p.UnitPrice);
-                Console.WriteLine($"{p.ProductId,3}: {p.ProductName,40} | Price: {formattedUnitPrice,10} | Quantity: {p.QuantityPerUnit,-25} | Stock: {p.UnitsInStock,4}");
+                Console.WriteLine($"{p.ProductId,3}: {p.ProductName,-40}");
                 Console.ResetColor();
             } else {
                 string formattedUnitPrice = string.Format("{0:C}", p.UnitPrice);
-                Console.WriteLine($"{p.ProductId,3}: {p.ProductName,40} | Price: {formattedUnitPrice,10} | Quantity: {p.QuantityPerUnit,-25} | Stock: {p.UnitsInStock,4}");
+                Console.WriteLine($"{p.ProductId,3}: {p.ProductName,-40}");
             }
         }
     } else {
+        logger.Info("Displaying only active products");
         var products = db.Products.OrderBy(p => p.ProductId).Where(p => p.Discontinued == false);
         foreach (Product p in products) {
-            Console.WriteLine($"{p.ProductId}: {p.ProductName}");
+            Console.WriteLine($"{p.ProductId,3}: {p.ProductName,-40}");
         }
+    }
+}
+
+static void DiscontinuedProducts(NWContext db) {
+    var products = db.Products.OrderBy(p => p.ProductId).Where(p => p.Discontinued == true);
+    foreach (Product p in products) {
+        Console.ForegroundColor = ConsoleColor.Red;
+        Console.WriteLine($"{p.ProductId,3}: {p.ProductName,-40}");
+        Console.ResetColor();
     }
 }
 
@@ -384,6 +417,38 @@ static void DisplayCategoryProducts(NWContext db) {
         }
         Console.WriteLine();
     }
+}
+
+// Displays category and total assets
+static void DisplayInventoryReport(NWContext db) {
+    decimal assetsTotal = 0;
+    var categories = db.Categories.OrderBy(c => c.CategoryId).ToList();
+    foreach (var c in categories) {
+        decimal assetsCategory = 0;
+        Console.ForegroundColor = ConsoleColor.Blue;
+        Console.WriteLine($"{c.CategoryName}");
+        Console.ResetColor();
+        var productsCategory = db.Products.Where(p => p.CategoryId == c.CategoryId && p.Discontinued == false).ToList();
+        if (productsCategory.Any()) {
+
+            foreach (Product p in productsCategory) {
+                decimal assetsProduct = (decimal)p.UnitsInStock * (decimal)p.UnitPrice;
+                Console.WriteLine($"  {p.ProductId,3}: {p.ProductName,-40} | Stock: {p.UnitsInStock,5} | Price: {p.UnitPrice,8:C} | Total: {assetsProduct,10:C}");
+                assetsCategory += assetsProduct;
+                assetsTotal += assetsProduct;
+
+            }
+        } else {
+            Console.WriteLine("No active products found in this category.");
+        }
+        Console.WriteLine($"                                                                 Total category assets: {assetsCategory,12:C}");
+        Console.WriteLine();
+    }
+    Console.WriteLine();
+    Console.BackgroundColor = ConsoleColor.DarkGreen;
+    Console.Write($"Total combined assets: {assetsTotal,12:C}");
+    Console.ResetColor();
+    Console.WriteLine();
 }
 
 // Returns a category ID
