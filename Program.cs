@@ -247,9 +247,15 @@ try {
             Console.ForegroundColor = ConsoleColor.White;
             Console.WriteLine("  ID                Product                        Price         Quantity          Stock    Category  ");
             Console.ResetColor();
-            foreach (var p in queryProducts) {
-                Console.WriteLine($" {p.Record} | {p.CategoryName,12}");
+            if (queryProducts.Any()) {
+                foreach (var p in queryProducts) {
+                    Console.WriteLine($" {p.Record} | {p.CategoryName,12}");
+                }
+            } else {
+                logger.Warn($"User query - {query} - returned zero results");
+                Console.WriteLine("No results found");
             }
+            Console.WriteLine("");
             Console.WriteLine("Press any key to continue.");
             Console.ReadKey();
             break;

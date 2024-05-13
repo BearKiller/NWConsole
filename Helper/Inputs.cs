@@ -96,20 +96,35 @@ namespace Helper
 
         public static string GetString(string prompt) {
 
+            char[] illegalChars = new char[] {'\\', '|', '\'', '"', '/', '*', '+', '^', ';' };
             string path = Directory.GetCurrentDirectory() + $"{Path.DirectorySeparatorChar}nlog.config";
             var logger = LogManager.LoadConfiguration(path).GetCurrentClassLogger();
+            bool isSuccess = false;
+            bool containsIllegalChar = true;
+            string returnValue = null;
 
-            while (true) {
+            do {
                 Console.Write(prompt);
                 string userInput = Console.ReadLine();
 
                 if (!String.IsNullOrEmpty(userInput)) {
-                    return userInput;
+                    isSuccess = true;
+                    containsIllegalChar = userInput.Any(x => illegalChars.Contains(x));
 
                 } else {
                     logger.Error("Input can not be null.");
                 }
-            }
+
+                if (!containsIllegalChar) {
+                    isSuccess = true;
+                } else {
+                    isSuccess = false;
+                    logger.Error("Input must not contain illegal characters (\\|/\'\"*+^;')");
+                }
+
+            } while (!isSuccess);
+
+            return returnValue;
         }
 
         public static char GetChar(string prompt, char[] possibleAnswers) {
