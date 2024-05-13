@@ -122,6 +122,8 @@ namespace Helper
                     logger.Error("Input must not contain illegal characters (\\|/\'\"*+^;')");
                 }
 
+                returnValue = userInput;
+                
             } while (!isSuccess);
 
             return returnValue;

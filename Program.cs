@@ -46,6 +46,7 @@ try {
             Console.WriteLine("1) Product");
             Console.WriteLine("2) Category");
             char addOption = Inputs.GetChar("> ", new char[] {'1', '2', 'q', 'Q'});
+            logger.Info($"User choice: {addOption}");
 
             // Creates a new product
             if (addOption == '1') {
@@ -120,6 +121,7 @@ try {
             Console.WriteLine("1) Products");
             Console.WriteLine("2) Categories");
             char editOption = Inputs.GetChar("> ", new char[] {'1', '2', 'q', 'Q'});
+            logger.Info($"User choice: {editOption}");
 
             // Edits a product
             if (editOption == '1'){
@@ -178,6 +180,7 @@ try {
             Console.WriteLine("4) Categories");
             Console.WriteLine("5) Categories and their active products");
             char displayOption = Inputs.GetChar("> ", new char[] {'1', '2', '3', '4', '5', 'q', 'Q'});
+            logger.Info($"User choice: {displayOption}");
 
             // Displays all products
             if (displayOption == '1') {
@@ -236,10 +239,11 @@ try {
             // Search through products
             case '4':
             Console.Clear();
-            string query = Inputs.GetString("Search for product name > ");
+            string query = Inputs.GetString("Search for product name > ").ToLower();
+            logger.Info("User query: {query}", query);
             var queryProducts = from p in db.Products
                 join c in db.Categories on p.CategoryId equals c.CategoryId
-                where p.ProductName.Contains(query)
+                where p.ProductName.ToLower().Contains(query)
                 select new { Record = $"{p.ProductId,3}: {p.ProductName,-40} | {p.UnitPrice,8:C} | {p.QuantityPerUnit,-20} | {p.UnitsInStock,4}", CategoryName = c.CategoryName};
                 
             Console.WriteLine($"{queryProducts.Count()} products match your search criteria");
