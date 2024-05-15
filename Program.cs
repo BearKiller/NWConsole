@@ -79,7 +79,10 @@ try {
                             QuantityPerUnit = productQuantity,
                             UnitPrice = productPrice};
                         db.AddProduct(product);
+                        Console.WriteLine("");
                         logger.Info("Product added = {name}", product.ProductName);
+                        Console.WriteLine("Press any key to continue.");
+                        Console.ReadKey();
                     }
 
                 }
@@ -105,7 +108,10 @@ try {
                             CategoryName = categoryName,
                             Description = categoryDescription};
                         db.AddCategories(category);
+                        Console.WriteLine("");
                         logger.Info("Category added = {name}", category.CategoryName);
+                        Console.WriteLine("Press any key to continue.");
+                        Console.ReadKey();
                     }
                 }
             }
@@ -140,6 +146,7 @@ try {
                         editedProduct.UnitsOnOrder = Inputs.GetShort("Enter units on order > ");
                         editedProduct.ReorderLevel = Inputs.GetShort("Enter reorder level > ");
                         db.EditProduct(editedProduct);
+                        Console.WriteLine("");
                         logger.Info($"Product {product.ProductId}: {product.ProductName} updated");
                         Console.WriteLine("Press any key to continue.");
                         Console.ReadKey();
@@ -157,6 +164,7 @@ try {
                         editedCategory.CategoryName = Inputs.GetString("Enter a name for the category: ");
                         editedCategory.Description = Inputs.GetString("Enter a description: ");
                         db.EditCategory(editedCategory);
+                        Console.WriteLine("");
                         logger.Info($"Category {category.CategoryName} updated");
                         Console.WriteLine("Press any key to continue.");
                         Console.ReadKey();

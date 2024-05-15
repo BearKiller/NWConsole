@@ -25,7 +25,7 @@ namespace Helper
                 isSuccess = Int32.TryParse(userInput, out returnValue);
 
                 if (!isSuccess) {
-                    logger.Error("Input must be an integer.");
+                    logger.Error($"Input must be an integer. User Input: {userInput}");
                 }
                 
             } while (!isSuccess);
@@ -47,7 +47,7 @@ namespace Helper
                 isSuccess = Decimal.TryParse(userInput, out returnValue);
 
                 if (!isSuccess) {
-                    logger.Error("Input must be a decimal.");
+                    logger.Error($"Input must be a decimal. User Input: {userInput}");
                 }
                 
             } while (!isSuccess);
@@ -67,7 +67,7 @@ namespace Helper
                 isSuccess = Int16.TryParse(userInput, out returnValue);
 
                 if (!isSuccess) {
-                    logger.Error("Input must be a 16 bit integer");
+                    logger.Error($"Input must be a 16 bit integer. User Input: {userInput}");
                 }
             } while (!isSuccess);
             return returnValue;
@@ -86,7 +86,7 @@ namespace Helper
                 isSuccess = Boolean.TryParse(userInput, out returnValue);
 
                 if (!isSuccess) {
-                    logger.Error("Please enter either True or False");
+                    logger.Error($"Please enter either True or False. User Input: {userInput}");
                 }
 
             } while (!isSuccess);
@@ -119,7 +119,7 @@ namespace Helper
                     isSuccess = true;
                 } else {
                     isSuccess = false;
-                    logger.Error("Input must not contain illegal characters (\\|/\'\"*+^;')");
+                    logger.Error($"Input must not contain illegal characters (\\|/\'\"*+^;'). User Input: {userInput}");
                 }
 
                 returnValue = userInput;
@@ -144,7 +144,7 @@ namespace Helper
                 }
                 else {
                     if (userInput.Length > 1) {
-                        logger.Error("Multiple characters entered. Please enter a single character.");
+                        logger.Error($"Multiple characters entered. Please enter a single character. User Input: {userInput}");
                         continue;
                     }
                 }
@@ -152,7 +152,7 @@ namespace Helper
                 if (possibleAnswers.Contains(userInput[0])) {
                     return userInput[0];
                 } else {
-                    logger.Error("Input out of bounds.");
+                    logger.Error($"Input out of bounds. User Input: {userInput}");
                     Console.WriteLine("Only the following characters are allowed: "
                         + String.Join(", ", possibleAnswers));
                     continue;
