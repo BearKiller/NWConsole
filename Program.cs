@@ -161,7 +161,6 @@ try {
                     Category editedCategory = InputCategory(db, logger);
                     if (editedCategory != null) {
                         editedCategory.CategoryId = category.CategoryId;
-                        editedCategory.CategoryName = Inputs.GetString("Enter a name for the category: ");
                         editedCategory.Description = Inputs.GetString("Enter a description: ");
                         db.EditCategory(editedCategory);
                         Console.WriteLine("");
