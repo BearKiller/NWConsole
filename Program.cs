@@ -205,9 +205,10 @@ try {
                 var productByCategory = db.Products.OrderBy(p => p.ProductId).Where(p => p.Category == searchCategory);
                 foreach (Product p in productByCategory) {
                     if (p.Discontinued == false) {
-                        Console.WriteLine($" {p.ProductId}: {p.ProductName}");
+                        Console.WriteLine($" {p.ProductId,3}: {p.ProductName,-40}");
                     } 
                 }
+                logger.Info($"{productByCategory.Count()} products returned");
                 Console.WriteLine("Press any key to continue.");
                 Console.ReadKey();
 
@@ -369,7 +370,7 @@ static void DiscontinuedProducts(NWContext db) {
 static Product GetProduct(NWContext db, Logger logger) {
     var products = db.Products.OrderBy(p => p.ProductId);
     foreach (Product p in products) {
-        Console.WriteLine($"{p.ProductId}: {p.ProductName}");
+        Console.WriteLine($"{p.ProductId,3}: {p.ProductName,-40}");
     }
     if (int.TryParse(Console.ReadLine(), out int ProductId)) {
         Product product = db.Products.FirstOrDefault(p => p.ProductId == ProductId);
